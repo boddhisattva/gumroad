@@ -23,6 +23,10 @@ class PaypalChargeProcessor
     "paypal"
   end
 
+  def self.supports_dispute_evidence?
+    true
+  end
+
   def self.handle_paypal_event(paypal_event)
     raise "Event for transaction #{paypal_event.try(:[], 'txn_id')} does not have an invoice field" if paypal_event["invoice"].nil?
 

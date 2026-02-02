@@ -27,6 +27,10 @@ class StripeChargeProcessor
     "stripe"
   end
 
+  def self.supports_dispute_evidence?
+    true
+  end
+
   def merchant_migrated?(merchant_account)
     merchant_account&.is_a_stripe_connect_account?
   end

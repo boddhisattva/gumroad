@@ -200,6 +200,12 @@ module ChargeProcessor
     get_charge_processor(charge_processor_id).fight_chargeback(charge_id, dispute_evidence)
   end
 
+  # Public: Returns whether the charge processor supports dispute evidence submission.
+  def self.supports_dispute_evidence?(charge_processor_id)
+    charge_processor_class = CHARGE_PROCESSOR_CLASS_MAP[charge_processor_id]
+    charge_processor_class&.supports_dispute_evidence? || false
+  end
+
   # Public: Returns where the funds are held for this merchant account.
   # Returns a constant defined in HolderOfFunds.
   def self.holder_of_funds(merchant_account)

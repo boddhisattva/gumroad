@@ -18,6 +18,10 @@ class BraintreeChargeProcessor
     "braintree"
   end
 
+  def self.supports_dispute_evidence?
+    false
+  end
+
   def get_chargeable_for_params(params, _gumroad_guid)
     zip_code = params[:cc_zipcode] if params[:cc_zipcode_required]
     nonce = params[:braintree_nonce]

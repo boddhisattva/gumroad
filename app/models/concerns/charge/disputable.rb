@@ -225,8 +225,9 @@ module Charge::Disputable
   end
 
   def eligible_for_dispute_evidence?
-    return false unless charge_processor == StripeChargeProcessor.charge_processor_id
+    return false unless ChargeProcessor.supports_dispute_evidence?(charge_processor)
     return false if merchant_account&.is_a_stripe_connect_account?
+    return false if merchant_account&.is_a_paypal_connect_account? && merchant_account&.user_id.present?
     true
   end
 

@@ -15,6 +15,7 @@ describe Charge::Disputable, :vcr do
     create(:purchase,
            charge_processor_id: PaypalChargeProcessor.charge_processor_id,
            stripe_transaction_id: "pp_12345",
+           paypal_order_id: "PAYPAL-ORDER-12345",
            total_transaction_cents: 20_00,
            succeeded_at: Date.new(2024, 2, 28))
   end
@@ -1149,36 +1150,65 @@ describe Charge::Disputable, :vcr do
   end
 
   describe "#eligible_for_dispute_evidence?" do
-    let(:purchase) { create(:purchase) }
+    context "when processor is Stripe" do
+      it "returns true" do
+        expect(stripe_purchase.eligible_for_dispute_evidence?).to be(true)
+      end
+    end
 
     context "when processor is PayPal" do
-      before { purchase.update!(charge_processor_id: PaypalChargeProcessor.charge_processor_id) }
-
-      it "returns false" do
-        expect(purchase.eligible_for_dispute_evidence?).to be(false)
+      it "returns true" do
+        expect(paypal_purchase.eligible_for_dispute_evidence?).to be(true)
       end
     end
 
     context "when processor is Braintree" do
-      before { purchase.update!(charge_processor_id: BraintreeChargeProcessor.charge_processor_id) }
-
       it "returns false" do
-        expect(purchase.eligible_for_dispute_evidence?).to be(false)
+        expect(braintree_purchase.eligible_for_dispute_evidence?).to be(false)
       end
     end
 
     context "when the purchase is made via a Stripe Connect account" do
+      let(:stripe_connect_purchase) do
+        create(:purchase,
+               charge_processor_id: StripeChargeProcessor.charge_processor_id,
+               stripe_transaction_id: "ch_connect_123",
+               total_transaction_cents: 10_00,
+               succeeded_at: Time.zone.now)
+      end
+
       before do
         expect_any_instance_of(MerchantAccount).to receive(:is_a_stripe_connect_account?).twice.and_return(true)
       end
 
       it "returns false" do
-        expect(purchase.eligible_for_dispute_evidence?).to be(false)
+        expect(stripe_connect_purchase.eligible_for_dispute_evidence?).to be(false)
       end
     end
 
-    it "returns true" do
-      expect(purchase.eligible_for_dispute_evidence?).to be(true)
+    context "when the purchase is made via a PayPal Connect account" do
+      let(:creator) { create(:user) }
+      let(:product) { create(:product, user: creator) }
+      let(:paypal_connect_merchant_account) do
+        create(:merchant_account,
+               charge_processor_id: PaypalChargeProcessor.charge_processor_id,
+               user: creator)
+      end
+      let(:paypal_connect_purchase) do
+        create(:purchase,
+               link: product,
+               seller: creator,
+               charge_processor_id: PaypalChargeProcessor.charge_processor_id,
+               stripe_transaction_id: "pp_connect_123",
+               paypal_order_id: "PAYPAL-CONNECT-ORDER-123",
+               merchant_account: paypal_connect_merchant_account,
+               total_transaction_cents: 10_00,
+               succeeded_at: Time.zone.now)
+      end
+
+      it "returns false" do
+        expect(paypal_connect_purchase.eligible_for_dispute_evidence?).to be(false)
+      end
     end
   end
 
