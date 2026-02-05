@@ -4,6 +4,9 @@ class PaypalRestApi
   include CurrencyHelper
 
   PAYPAL_INTENT_CAPTURE = "CAPTURE"
+  PAYPAL_CARRIER_OTHER = "OTHER"
+  PAYPAL_CARRIER_UNKNOWN = "Unknown"
+  NOTE_MAX_LENGTH = 2000
 
   def initialize
     paypal_environment = Rails.env.production? ?
@@ -123,6 +126,33 @@ class PaypalRestApi
     execute_request
   end
 
+  def provide_evidence(dispute_id:, dispute_evidence:)
+    base_url = @paypal_client.environment.base_url
+    url = "#{base_url}/v1/customer/disputes/#{dispute_id}/provide-evidence"
+
+    attached_files = all_attached_files(dispute_evidence)
+
+    evidence = {
+      documents: attached_files.map { |blob| { name: blob.filename.to_s } },
+      notes: build_evidence_notes(dispute_evidence)
+    }
+
+    evidence_info = build_evidence_info(dispute_evidence)
+    evidence[:evidence_info] = evidence_info if evidence_info.present?
+
+    input_json = { evidences: [evidence] }
+
+    payload = { input: input_json.to_json }
+    attached_files.each_with_index { |blob, index| payload["file#{index + 1}"] = blob.download }
+
+    response = RestClient.post(url, payload, rest_api_headers)
+    OpenStruct.new(status_code: response.code, result: JSON.parse(response.body))
+  rescue RestClient::ExceptionWithResponse => e
+    # TODO: Consider improving error handling later with notifying via Bugsnag
+    Rails.logger.error "PayPal provide-evidence failed: #{e.response.body}"
+    raise ChargeProcessorInvalidRequestError.new(e.response.body)
+  end
+
   def successful_response?(api_response)
     (200...300).include?(api_response.status_code)
   end
@@ -173,6 +203,63 @@ class PaypalRestApi
       body = {}
       body[:amount] = money_object(currency:, value: amount) if amount.to_f > 0
       body
+    end
+
+    # Dynamically collects all attached files from DisputeEvidence
+    # Uses Rails reflection to find all ActiveStorage attachments
+    def all_attached_files(dispute_evidence)
+      dispute_evidence.class.reflect_on_all_attachments.filter_map do |attachment|
+        blob = dispute_evidence.public_send(attachment.name)
+        blob if blob.attached?
+      end
+    end
+
+    def build_evidence_info(dispute_evidence)
+      info = {}
+
+      if dispute_evidence.shipping_tracking_number.present?
+        tracking_info = build_tracking_info(dispute_evidence)
+        info[:tracking_info] = [tracking_info] if tracking_info.present?
+      end
+
+      info
+    end
+
+    def build_tracking_info(dispute_evidence)
+      carrier_mapper = PaypalCarrierMapper.new
+      tracking_info = {}
+
+      if dispute_evidence.shipping_carrier.present?
+        paypal_carrier_code = carrier_mapper.lookup(dispute_evidence.shipping_carrier)
+
+        if paypal_carrier_code.present?
+          tracking_info[:carrier_name] = paypal_carrier_code
+        else
+          tracking_info[:carrier_name] = PAYPAL_CARRIER_OTHER
+          tracking_info[:carrier_name_other] = dispute_evidence.shipping_carrier.truncate(2000)
+        end
+      else
+        tracking_info[:carrier_name] = PAYPAL_CARRIER_OTHER
+        tracking_info[:carrier_name_other] = PAYPAL_CARRIER_UNKNOWN
+      end
+
+      tracking_info[:tracking_number] = dispute_evidence.shipping_tracking_number
+
+      tracking_info
+    end
+
+    def build_evidence_notes(dispute_evidence)
+      notes = []
+      notes << "Product: #{dispute_evidence.product_description}" if dispute_evidence.product_description.present?
+      notes << "Customer: #{dispute_evidence.customer_name}" if dispute_evidence.customer_name.present?
+      notes << "Email: #{dispute_evidence.customer_email}" if dispute_evidence.customer_email.present?
+      notes << "IP: #{dispute_evidence.customer_purchase_ip}" if dispute_evidence.customer_purchase_ip.present?
+      notes << "Billing address: #{dispute_evidence.billing_address}" if dispute_evidence.billing_address.present?
+      notes << "Shipping address: #{dispute_evidence.shipping_address}" if dispute_evidence.shipping_address.present?
+      notes << "Reason for winning: #{dispute_evidence.reason_for_winning}" if dispute_evidence.reason_for_winning.present?
+      notes << dispute_evidence.uncategorized_text if dispute_evidence.uncategorized_text.present?
+
+      notes.compact.join("\n\n").truncate(NOTE_MAX_LENGTH)
     end
 
     def timestamp

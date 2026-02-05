@@ -1,0 +1,737 @@
+# PayPal Carrier Codes Mapping
+# Source: https://developer.paypal.com/docs/api/customer-disputes/v1/#disputes_provide-evidence
+#
+#
+# Last updated set of carrier codes from PayPal Provide Evidence API: 2026-02-04
+
+# Major US Carriers
+"UPS": UPS
+"United Parcel Service": UPS
+"United Parcel Service of America, Inc.": UPS
+"USPS": USPS
+"United States Postal Service": USPS
+"United States Postal Service (USPS)": USPS
+"FedEx": FEDEX
+"Federal Express": FEDEX
+"DHL": DHL
+"DHL Express": DHL
+"Airborne Express": AIRBORNE_EXPRESS
+
+# UK Carriers
+"Royal Mail": ROYAL_MAIL
+"Parcel Force": PARCELFORCE
+"Parcelforce": PARCELFORCE
+"Parcelforce UK": UK_PARCELFORCE
+"Airsure": AIRSURE
+"Swiftair": SWIFTAIR
+"Swift Air": SWIFTAIR
+"Royal Mail Special Delivery UK": UK_ROYALMAIL_SPECIAL
+"Royal Mail Recorded UK": UK_ROYALMAIL_RECORDED
+"Royal Mail International Signed": UK_ROYALMAIL_INT_SIGNED
+"Royal Mail AirSure UK": UK_ROYALMAIL_AIRSURE
+"United Parcel Service UK": UK_UPS
+"UPS UK": UK_UPS
+"Federal Express UK": UK_FEDEX
+"FedEx UK": UK_FEDEX
+"Airborne Express UK": UK_AIRBORNE_EXPRESS
+"DHL UK": UK_DHL
+"Other - UK": UK_OTHER
+"Cannot provide tracking UK": UK_CANNOT_PROV_TRACK
+"Cannot provide tracking - UK": UK_CANNOT_PROVIDE_TRACKING
+
+# Canadian Carriers
+"Canada Post": CA_CANADA_POST
+"Purolator Canada": CA_PUROLATOR
+"Purolator": PUROLATOR
+"Canpar Courier Canada": CA_CANPAR_COURIER
+"Canpar Courier": CANPAR
+"Canpar": CANPAR
+"Loomis Express Canada": CA_LOOMIS
+"Loomis Express": LOOMIS_EXPRESS
+"TNT Express Canada": CA_TNT
+"TNT": TNT
+"TNT Global": GLOBAL_TNT
+"Other - Canada": CA_OTHER
+"Cannot provide tracking Canada": CA_CANNOT_PROV_TRACK
+"Cannot provide tracking - Canada": CA_CANNOT_PROVIDE_TRACKING
+
+# German Carriers
+"DHL Parcel Europe": DE_DP_DHL_WITHIN_EUROPE
+"DHL T and T Express": DE_DP_DHL_T_AND_T_EXPRESS
+"DHL DP International shipments": DE_DHL_DP_INTL_SHIPMENTS
+"General Logistics Systems (GLS) Germany": DE_GLS
+"GLS Germany": DE_GLS
+"DPD Tracking Germany": DE_DPD_DELISTACK
+"DPD Germany": DE_DPD
+"Hermes Germany": DE_HERMES
+"United Parcel Service Germany": DE_UPS
+"UPS Germany": DE_UPS
+"Federal Express Germany": DE_FEDEX
+"FedEx Germany": DE_FEDEX
+"TNT Germany": DE_TNT
+"Other - Germany": DE_OTHER
+
+# French Carriers
+"Chronopost France": FR_CHRONOPOST
+"Chronopost": CHRONOPOST
+"Coliposte France": FR_COLIPOSTE
+"DHL France": FR_DHL
+"United Parcel Service France": FR_UPS
+"UPS France": FR_UPS
+"Federal Express France": FR_FEDEX
+"FedEx France": FR_FEDEX
+"TNT France": FR_TNT
+"General Logistics Systems (GLS) France": FR_GLS
+"GLS France": FR_GLS
+"Other - France": FR_OTHER
+"Suivi": FR_SUIVI
+"Mondial France": FR_MONDIAL
+"La Poste": LA_POSTE
+"Laposte": FR_LAPOSTE
+"Geodis France": FR_GEODIS
+"Bert France": FR_BERT
+"Colis France": FR_COLIS
+"Teliway": FR_TELIWAY
+
+# Italian Carriers
+"Poste Italia": IT_POSTE_ITALIA
+"Poste Italiane": IT_POSTE_ITALIANE
+"Posteitaliane": POSTE_ITALIANE
+"DHL Italy": IT_DHL
+"United Parcel Service Italy": IT_UPS
+"UPS Italy": IT_UPS
+"Federal Express Italy": IT_FEDEX
+"FedEx Italy": IT_FEDEX
+"TNT Italy": IT_TNT
+"General Logistics Systems (GLS) Italy": IT_GLS
+"GLS Italy": GLS_ITALY
+"Other Italy": IT_OTHER
+"Poste Italiane SDA": IT_EBOOST_SDA
+"SDA Italy": IT_SDA
+"SDA Express Courier": IT_SDA
+"BRT Corriere Espresso Italy": IT_BRT
+"Fercam Italy": IT_FERCAM
+"Hermes Italy": HERMES_IT
+"SGT Corriere Espresso Italy": IT_SGT
+"Nexive (TNT Post Italy)": IT_NEXIVE
+
+# Australian Carriers
+"Australia Post EP Plat": AU_AUSTRALIA_POST_EP_PLAT
+"Australia Post Eparcel": AU_AUSTRALIA_POST_EPARCEL
+"Australia Post EMS": AU_AUSTRALIA_POST_EMS
+"Australian Postal Corporation": AU_AU_POST
+"Australia Post": AUSTRALIA_POST
+"DHL Australia": AU_DHL
+"StarTrack Express Australia": AU_STAR_TRACK_EXPRESS
+"StarTrack": STARTRACK
+"Star Track": STARTRACK
+"Star Track Express": STAR_TRACK_EXPRESS
+"United Parcel Service Australia": AU_UPS
+"UPS Australia": AU_UPS
+"Federal Express Australia": AU_FEDEX
+"FedEx Australia": AU_FEDEX
+"TNT Australia": TNT_AU
+"Toll IPEC Australia": AU_TOLL_IPEC
+"Toll IPEC": TOLL_IPEC
+"Toll Australia": AUS_TOLL
+"Toll": TOLL
+"Other - Australia": AU_OTHER
+"Bonds Couriers": BONDSCOURIERS
+"Couriers Please": COURIERS_PLEASE
+"DTDC Australia": DTDC_AU
+"Fastway Australia": AU_FASTWAY
+"Hunter Express": HUNTER_EXPRESS
+"Sendle": SENDLE
+"UBI Logistics": UBI_LOGISTICS
+"Omniparcel": OMNIPARCEL
+"Quantium": QUANTIUM
+
+# Spanish Carriers
+"Correos de Espana": ES_CORREOS_DE_ESPANA
+"Correos De Spain": ES_CORREOS
+"Sociedad Estatal Correos y Telégrafos": ESP_CORREOS
+"DHL Spain": ES_DHL
+"United Parcel Service Spain": ES_UPS
+"UPS Spain": ES_UPS
+"Federal Express Spain": ES_FEDEX
+"FedEx Spain": ES_FEDEX
+"TNT Spain": ES_TNT
+"Other - Spain": ES_OTHER
+"General Logistics Systems (GLS) Spain": ES_GLS
+"Nacex Spain": ESP_NACEX
+"Parcel Monitor Spain": ESP_ASM
+"Redur Spain": ESP_REDUR
+"Seur Spain": SEUR_ES
+
+# Austrian Carriers
+"EMS Express Mail Service Austria": AT_AUSTRIAN_POST_EMS
+"Austrian Post Prime": AT_AUSTRIAN_POST_PPRIME
+"Austrian Post": AUSTRIAN_POST
+"Austrian Post Express": AUSTRIAN_POST_EXPRESS
+"Austrian Post Registered": AUSTRIAN_POST
+"DHL Austria": AT_DHL
+
+# Belgian Carriers
+"Chronopost Belgium": BE_CHRONOPOST
+"Taxi Post": BE_TAXIPOST
+"Kiala Point Belgium": BE_KIALA
+"bpost": EU_BPOST
+"BPost": BPOST
+"BPost International": BPOST_INT
+"Mondial Belgium": BE_MONDIAL
+"DHL Belgium": BEL_DHL
+
+# Swiss Carriers
+"Swiss Post Express": CH_SWISS_POST_EXPRES
+"Swiss Post Priority": CH_SWISS_POST_PRIORITY
+"Swiss Post": SWISS_POST
+
+# Chinese Carriers
+"China Post": CN_CHINA_POST
+"China Post EMS": CN_CHINA_POST_EMS
+"China Post EMS Express Mail Service": CN_CHINA_POST_EMS
+"Federal Express China": CN_FEDEX
+"FedEx China": CN_FEDEX
+"TNT China": CN_TNT
+"United Parcel Service China": CN_UPS
+"UPS China": CN_UPS
+"Other - China": CN_OTHER
+"SF Express China": CN_SF_EXPRESS
+"SF Express": SF_EX
+"EMS China": CN_EMS
+"CN Express China": CNEXPS
+"Cpacket": CPACKET
+"Cuckoo Express": CUCKOOEXPRESS
+"EC China": CN_EC
+"EMPS China": CN_EMPS
+"Equick China": CN_EQUICK
+"Yunda Express": CN_YUNDA
+"WishPost": CN_WISHPOST
+"Best Express": CN_BESTEXPRESS
+"DPEX": CN_DPEX
+"WeDo Logistics": CN_WEDO
+"GoFly": CN_GOFLY
+"JCEX courier": CN_JCEX
+"BoxC courier": CN_BOXC
+"17 Post Service": CN_17POST
+"Post56": CN_POST56
+"STO Express": CN_STO
+"PayPal Package": CN_PAYPAL_PACKAGE
+
+# Hong Kong Carriers
+"Hong Kong Post": HK_HONGKONG_POST
+"4PX Express Hong Kong": HK_FOUR_PX_EXPRESS
+"Flyt Express Hong Kong": HK_FLYT_EXPRESS
+"TA-Q-BIN Parcel Hong Kong": HK_TAQBIN
+"Kerry Express Hong Kong": HK_KERRYEXPRESS
+"Logistics Worldwide Express Hong Kong": HK_LOGISTICSWORLDWIDEEXPRESS
+"RPX Hong Kong": HK_RPX
+"Spreadel Hong Kong": HK_SPREADEL
+"LWE Hong Kong": LWE_HK
+"TGX": HK_TGX
+"DHL HonKong": DHL_HK
+"DPD Hong Kong": DPD_HK
+"Asendia Hong Kong": ASENDIA_HK
+"CJ Logistics International(Hong Kong)": CJ_HK_INTERNATIONAL
+
+# Ireland Carriers
+"Post SDS EMS Express Mail Service Ireland": IE_AN_POST_SDS_EMS
+"Post SDS Priority Ireland": IE_AN_POST_SDS_PRIORITY
+"Post Registered Ireland": IE_AN_POST_REGISTERED
+"Swift Post Ireland": IE_AN_POST_SWIFTPOST
+"An Post Ireland": AN_POST
+"AddressPay UK": UK_AN_POST
+"DPD Ireland": DPD_IR
+"Fastway Ireland": FASTWAY_IR
+
+# Indian Carriers
+"India Post": INDIA_POST
+"Delhivery India": IND_DELHIVERY
+"Blue Dart Express DHL": IND_BLUEDART
+"Bluedart": BLUEDART
+"DTDC India": IND_DTDC
+"Professional Couriers India": IND_PROFESSIONAL_COURIERS
+"Red Express India": IND_REDEXPRESS
+"XpressBees India": IND_XPRESSBEES
+"DotZot India": IND_DOTZOT
+"deliverE": IND_DELIVREE
+"Safexpress": IND_SAFEEXPRESS
+"Gati-KWE": IND_GATI
+"GoJavas": IND_GOJAVAS
+"Jayon Express (JEX)": IND_JAYONEXPRESS
+"Ekart": EKART
+
+# Japanese Carriers
+"Japan Post": JAPAN_POST
+"Sagawa Kyuu Bin Japan": JP_SAGAWA_KYUU_BIN
+"Sagawa": SAGAWA
+"Nittsu Pelican Bin Japan": JP_NITTSU_PELICAN_BIN
+"Nippon Express": NITTSU_PELICAN_BIN
+"Kuro Neko Yamato Unyuu Japan": JP_KURO_NEKO_YAMATO_UNYUU
+"Yamato Transport Co.": NEKO_YAMATO_UNYUU
+"Yamato Japan": YAMATO
+"TNT Japan": JP_TNT
+"DHL Japan": JP_DHL
+"United Parcel Service Japan": JP_UPS
+"UPS Japan": JP_UPS
+"Federal Express Japan": JP_FEDEX
+"FedEx Japan": JP_FEDEX
+"Seino": SEINO
+"MailPlus (Japan)": MAILPLUS_JPN
+
+# Korean Carriers
+"Korea Post": KOREA_POST
+"CJ Korea": KOR_CJ
+"CJ Logistics Korea": CJ_KR
+"Ecargo Korea": KOR_ECARGO
+"SRE Korea": SREKOREA
+"CJ Logistics": CJ_LOGISTICS
+"Logistics Worldwide Korea": KR_LOGISTICSWORLDWIDE
+"Kyungdong Parcel": KYUNGDONG_PARCEL
+
+# Netherlands Carriers
+"TPG Post Netherlands": NL_TPG
+"TPG International & Domestic Express": TPG
+"TNT Netherlands": NL_TNT
+"DHL Netherlands": NL_DHL
+"United Parcel Service Netherlands": NL_UPS
+"UPS Netherlands": NL_UPS
+"Federal Express Netherlands": NL_FEDEX
+"FedEx Netherlands": NL_FEDEX
+"KIALA Netherlands": NL_KIALA
+"Pickup Netherlands": NL_PICKUP
+"Intangible Netherlands": NL_INTANGIBLE
+"ABC Mail Netherlands": NL_ABC_MAIL
+"Koninklijke PostNL": POSTNL_INT_3_S
+"PostNL": POSTNL
+"PostNL International 3S": POSTNL_INTL_3S
+"PostNl International": POSTNL_INT
+"General Logistics Systems (GLS) Netherlands": NLD_GLS
+"Transmission Netherlands": NLD_TRANSMISSION
+"DHL Parcel Netherlands": DHL_PARCEL_NL
+"Fiege Netherlands": FIEGE_NL
+
+# Polish Carriers
+"Poczta Polska": PL_POCZTA_POLSKA
+"Poczta Poland": POL_POCZTA
+"Pocztex": PL_POCZTEX
+"General Logistics Systems Poland": PL_GLS
+"DPD Poland": DPD_POLAND
+"InPost Paczkomaty": INPOST_PACZKOMATY
+"Masterlink Poland": PL_MASTERLINK
+"TNT Express Poland": PL_TNT
+"DHL Portugal": PL_DHL
+"United Parcel Service Poland": PL_UPS
+"UPS Poland": PL_UPS
+"Federal Express Poland": PL_FEDEX
+"FedEx Poland": PL_FEDEX
+"Siodemka Poland": POL_SIODEMKA
+
+# Singapore Carriers
+"SingPost": SG_SINGPOST
+"Singapore Post": SG_SG_POST
+"TA-Q-BIN Parcel Singapore": SG_TAQBIN
+"Ninjavan Singapore": SG_NINJAVAN
+"Zalora Singapore": SG_ZALORA
+"Jetship Singapore": JETSHIP_SG
+"JetShip Singapore": JETSHIP_SG
+"Parcel Post Singapore": SG_PARCELPOST
+"Detrack": SG_DETRACK
+"Qxpress": SG_QXPRESS
+"DPEX Worldwide Singapore": SG_DPEX
+"DHL Singapore": SG_DHL
+"Spreadel Singapore": SG_SPREADEL
+"J&T Express Singapore": SIMPLYPOST
+
+# Taiwan Carriers
+"Chunghwa POST Taiwan": TW_CHUNGHWA_POST
+"Chunghwa Post": CHUNGHWA_POST
+"Taiwan Post": TAIWAN_POST_TW
+
+# Thailand Carriers
+"Kerry Thailand": THA_KERRY
+"Kerry Express Thailand": KERRY_EXPRESS_TH
+"SendIt": SENDIT
+"aCommerce": ACOMMERCE
+"Ninjavan Thailand": NINJAVAN_THAI
+"Nim Express": NIM_EXPRESS
+"Thailand Post": THA_THAILAND_POST
+"Dynamic Logistics Thailand": THA_DYNAMIC_LOGISTICS
+"Alphafast": ALPHAFAST
+"Fastrak Thailand": FASTRAK_TH
+"EParcel Korea": EPARCEL_KR
+"CJ Logistics in Thailand": CJ_KOREA_THAI
+"CJ Thailand": CJ_TH
+"Flash Express": FLASHEXPRESS
+"Kerry TJ Logistics": KERRYTJ
+"Kerry Express (Vietnam) Co Ltd": KERRYTTC_VN
+
+# Philippines Carriers
+"Ninja Van Philippines": NINJAVAN_PHILIPPINES
+"Xend Express Philippines": PHL_XEND_EXPRESS
+"LBC Philippines": PHL_LBC
+"LBC Express": LBC_PH
+"JamExpress Philippines": PHL_JAMEXPRESS
+"Airspeed Philippines": PHL_AIRSPEED
+"RAF Philippines": PHL_RAF
+"2GO Shipping Philippines": PHL_2_GO
+"Air 21 Philippines": PHL_AIR_21
+"AIR21 courier": PHL_AIR21
+
+# Malaysian Carriers
+"Nationwide Malaysia": NATIONWIDE_MY
+"Pos Malaysia": MYS_MYS_POST
+"Pos Malaysia Berhad": MALAYSIA_POST
+"Malaysia Post EMS / Pos Laju": MYS_EMS
+"TA-Q-BIN Parcel Malaysia": MYS_TAQBIN
+"Skynet Malaysia": MYS_SKYNET
+"Skynet Malaysia": SKYNET_MY
+"Citylink Malaysia": MYS_CITYLINK
+"CityLink Malaysia": CITYLINK_MY
+"Airpak Malaysia": MYS_AIRPAK
+"Ninjavan Malaysia": NINJAVAN_MY
+"Kangaroo Express Malaysia": KANGAROO_MY
+"ABX Express": ABXEXPRESS_MY
+"GDEX courier": MYS_GDEX
+"Jet Ship Malaysia": JETSHIP_MY
+"Logistics Worldwide Malaysia": MY_LOGISTICSWORLDWIDE
+"CJ Malaysia International": CJ_INT_MY
+"CJ Malaysia": CJ_MY
+"Line Clear Express & Logistics Sdn Bhd": LINE
+"WePost Sdn Bhd": WEPOST
+"M Xpress Sdn Bhd": M_XPRESS
+"Mypostonline": MYS_MYPOST_ONLINE
+"J&T EXPRESS MALAYSIA": JTEXPRESS
+
+# Vietnamese Carriers
+"Vietnam Post": VIETNAM_POST
+"ViettelPost": VNM_VIETTELPOST
+"Post EMS Vietnam": VNPOST_EMS
+"Kerry Express Vietnam": KERRY_EXPRESS_VN
+"J&T Express Vietnam": JTEXPRESS_VN
+"Nhat Tin Logistics": NTLOGISTICS_VN
+"Giao hàng nhanh": GIAO_HANG
+
+# Indonesian Carriers
+"Indonesia Post": IDN_POS
+"Pos Indonesia Domestic": POS_ID
+"Indonesia Post International": IDN_POS_INT
+"Pos Indonesia International": POS_INT
+"JNE Indonesia": IDN_JNE
+"Pandu Indonesia": IDN_PANDU
+"Pandu Logistics": PANDU
+"RPX International": RPX
+"Tiki Indonesia": IDN_TIKI
+"Tiki": TIKI_ID
+"Lion Parcel Indonesia": IDN_LION_PARCEL
+"Lion Parcel": LION_PARCEL
+"Ninjavan Indonesia": NINJAVAN_ID
+"Wahana Indonesia": IDN_WAHANA
+"Wahana Express Indonesia": WAHANA_ID
+"First Logistics Indonesia": IDN_FIRST_LOGISTICS
+"First Logistics": FIRST_LOGISITCS
+"RPX Indonesia": RPX_ID
+"PT Prima Multi Cipta": PRIMAMULTICIPTA
+"PT MGLOBAL LOGISTICS INDONESIA": MGLOBAL
+"Trans Kargo Internasional": TRANS_KARGO
+"Choir Express Indonesia": CHOIR_EXP
+"INDOPAKET": INDOPAKET
+
+# Brazilian Carriers
+"Correos Brazil": CORREOS_BR
+"Correios Brazil": BRA_CORREIOS
+"Intelipost (TMS for LATAM)": INTELIPOST
+"Frete Rapido": FRETERAPIDO
+
+# Mexican Carriers
+"Mex Post Correos de Mexico": CORREOS_DE_MEXICO
+"Correos De Mexico": CORREOS_MX
+"Estafeta Mexico": MEX_ESTAFETA
+"Estafeta": ESTAFETA
+"Senda Mexico": MEX_SENDA
+"Redpack Mexico": MEX_REDPACK
+"Mexico Redpack": REDPACK
+"Aeroflash Mexico": MEX_AEROFLASH
+"Mexico Aeroflash": AEROFLASH
+"Mexico Senda Express": SENDA_MX
+
+# Portuguese Carriers
+"Internationational Seur Portugal": PRT_INT_SEUR
+"CTT Expresso Portugal": PRT_CTT
+"Chronopost Portugal": PRT_CHRONOPOST
+"Seur Portugal": PRT_SEUR
+"Adicional": ADICIONAL
+
+# Lithuanian Carriers
+"Lietuvos paštas Lithuania": LTU_LIETUVOS
+"Lietuvos Pastas": LIETUVOS_LT
+
+# Swedish Carriers
+"PostNord Sverige": SWE_POSTNORD
+"DB Schenker Sweden": SWE_DB
+"Direct Link Sweden": SWE_DIRECTLINK
+"PostNord Logistics Sweden": POSTNORD_LOGISTICS_SE
+"Post Nord Logistics": POSTNORD_LOGISTICS
+
+# New Zealand Carriers
+"New Zealand Post Limited (NZ)": NZ_NZ_POST
+"New Zealand Post": NZ_POST
+"CourierPost New Zealand": NZ_COURIER_POST
+"Courier Post": COURIER_POST
+"Fastway New Zealand": FASTWAY_NZ
+"NEW ZEALAND COURIERS": NEWZEALAND_COURIERS
+
+# Greek Carriers
+"Elta Greece": GR_ELTA
+"ACS Greece": GRC_ACS
+"Geniki Greece": GR_GENIKI
+"Parcel Monitor Greece": ACS_GR
+"Speed Couriers": SPEEDCOURIERS_GR
+
+# South African Carriers
+"The Courier Guy": THECOURIERGUY
+"fastway New Zealand": ZA_FASTWAY
+"DPE Express": DPE_EXPRESS
+"DPE South Africa": DPE_SOUTH_AFRC
+"Courier IT": ZA_COURIERIT
+"Skynet World Wide Express South Africa": SKYNET_ZA
+
+# UAE Carriers
+"Emirates Post Group": ARE_EMIRATES_POST
+"Emirates Post": EMIRATES_POST
+"SkyNet Worldwide Express Dubai, UAE": SKYNET_UAE
+
+# Other European Carriers
+"Cyprus Post": CYP_CYPRUS_POST
+"Hrvatska Pošta": HRV_HRVATSKA
+"Posten Norge": NOR_POSTEN
+"Posti": POSTI
+"Matkahuoloto": MATKAHUOLTO
+"Post of Serbia": POST_SERBIA
+"Serbia Post": POST_SERBIA_CS
+"BH POŠTA": BH_POSTA
+"Poșta Română": ROU_POSTA
+"Romanian Post": POSTAROMANA
+"Posta Romana": ROU_POSTA
+"Nova Poshta": NOVA_POSHTA
+"Nova Poshta International": NOVA_POSHTA_INT
+"Ukrposhta - Ukraine's National Post": UKR_POSHTA
+"UkrPoshta": POSTA_UKR
+"Česká pošta": CZE_CESKA
+"GLS General Logistics Systems Slovakia s.r.o.": GLS_SLOV
+"GLS Slovenia": GLS_SLOVEN
+"GLS Czech Republic": GLS_CZ
+"Post of Slovenia": POST_SLOVENIA
+"Slovenska pošta": SK_POSTA
+"Bulgarian Post": BULGARIAN_POST
+"Latvijas Pasts": LATVIJAS_PASTS
+"Magyar Posta": MAGYAR_HU
+"Omniva": OMNIVA
+"Yurtici Kargo": YURTICI_KARGO
+"PTT Turkey": TUR_PTT
+"PTT Posta": PTT_POST
+"Russian Post": RUSSIAN_POST
+"Jersey Post": JERSEY_POST
+
+# South American Carriers
+"Correo Argentino": ARG_CORREO
+"Correos Argentina": CORREOS_AG
+"OCA Argentia": ARG_OCA
+"OCA Argentina": OCA_AR
+"CorreosChile": CORREOS_CHILE
+"Correos Chile": CORREOS_CL
+"Correos de Costa Rica": CORREOS_CR
+"Correos De Costa Rica": CORREOS_CR
+"Correo Uruguayo": CORREO_UY
+"Grupo logistico Andreani": ANDREANI
+"Celeritas Transporte": CELERITAS
+"4-72 Entregando": 4_72
+"Coordinadora": COORDINADORA
+
+# Middle Eastern Carriers
+"Zajil Express Company": ZAJIL_EXPRESS
+"Aramex": ARAMEX
+"Aramex Australia (formerly Fastway AU)": ARAMEX_AU
+
+# Other Asian Carriers
+"Postur": POSTUR_IS
+"Lao Post": LAO_POST
+"Cambodia Post": KHM_CAMBODIA_POST
+"Saudi Post": SAU_SAUDI_POST
+"Israel Post": ISRAEL_POST
+"Israel Post Domestic": ISR_POST_DOMESTIC
+"Thabit Logistics": THABIT_LOGISTICS
+
+# African Carriers
+"Nigerian Postal Service": NGA_NIPOST
+"Courier Plus Nigeria": NG_COURIERPLUS
+
+# Global/Multi-Region Carriers
+"DHL Global": GLOBAL_DHL
+"DHL Global eCommerce": DHL_GLOBAL_ECOMMERCE
+"DHL eCommerce US": DHL_GLOBAL_MAIL
+"DHL eCommerce Asia (API)": DHL_ECOMERCE_ASA
+"DHL eCommerce Asia": DHL_GLOBAL_MAIL_ASIA
+"DHL Worldwide Express": DHL
+"DHL Express": GLOBAL_DHL
+"Skynet Global": GLOBAL_SKYNET
+"SkyNet Worldwide Express": SKYNET_WORLDWIDE
+"Skynet World Wide Express": SKYNET_WORLDWIDE
+"SkyNet Worldwide Express UK": SKYNET_UK
+"General Logistics Systems": GLS
+"GLS": GLS
+"DPD": DPD
+"DPD Global": DPD
+"DPD UK": DPD_UK
+"DPD Delistrack": DPD_DELISTRACK
+"DPD France": DPD_FR
+"DPD Germany": DPD_DE
+"DPD Local": DPD_LOCAL
+"DPD Local Reference": DPD_LOCAL_REF
+"DPD Poland": DPD_PL
+"DPD Romania": DPD_RO
+"DPD Russia": DPD_RU
+"DPD Hungary": DPD_HGRY
+"Hermes": HERMES
+"Hermesworld UK": HERMESWORLD_UK
+"MyHermes UK": MYHERMES
+"Hermes Einrichtungs Service GmbH & Co. KG": HERMES_2MANN_HANDLING
+"Raben Group": RABEN_GROUP
+"Landmark Global": LANDMARK_GLOBAL
+"Landmark Global Reference": LANDMARK_GLOBAL_REFERENCE
+
+# Specialized/eCommerce Carriers
+"Ascendia US": US_ASCENDIA
+"Asendia Germany": DE_ASENDIA
+"Asendia USA": ASENDIA_US
+"Asendia UK": ASENDIA_UK
+"Ensenda US": US_ENSENDA
+"Ensenda": ENSENDA
+"Globegistics US": US_GLOBEGISTICS
+"Globeistics US": US_GLOBEGISTICS
+"RR Donnelley": RRDONNELLEY
+"CollectPlus UK": UK_COLLECTPLUS
+"CollectPlus": COLLECTPLUS
+"Interlink Express UK": UK_INTERLINK_EXPRESS
+"Interlink Express": INTERLINK
+"TNT UK": UK_TNT
+"UK Mail": UK_MAIL
+"Yodel UK": UK_YODEL
+"Yodel": YODEL
+"Yodel Direct": YODEL_DIR
+"Yodel International": YODEL_INTNL
+"Buylogic": BUYLOGIC
+"DPEX": DPEX
+"DPEX Worldwide": DPEX
+"Seko Logistics": SEKOLOGISTICS
+"SEKO Worldwide": SEKO_SFTP
+"APC Overnight UK": GB_APC
+"APC Overnight": APC_OVERNIGHT
+"APC Overnight Consignment": APC_OVERNIGHT_CONNUM
+"Deltec UK": UK_DELTEC
+"Deltec Germany": DE_DELTEC
+"Deutsche Germany": DE_DEUTSCHE
+"Whistl": WHISTL
+"Parcel2Go": PARCEL2GO
+"Arrow XL": GB_ARROW
+"Tuffnells Parcels Express": GB_TUFFNELLS
+"Tuffnells Parcels Express- Reference": TUFFNELLS_REFERENCE
+"Panther": GB_PANTHER
+"Panther Reference": PANTHER_REFERENCE
+"Fastway UK": UK_FASTWAY
+"Fastway US": US_FASTWAY
+"Nightline UK": UK_NIGHTLINE
+"XDP Express": UK_XDP
+"XDP Express Reference": XDP_UK_REFERENCE
+"Wiseloads": WISELOADS
+"Pickupp": PICKUP
+"PICK UPP": PICKUPP_MYS
+"PICK UPP (Singapore)": PICKUPP_SGP
+"EShopWorld": ESHOPWORLD
+"WebInterpret": WEBINTERPRET
+"ABC Mail": ABC_MAIL
+"ABC Package Express": ABC_PACKAGE
+"Yanwen Express": YANWEN
+"Yanwen China": YANWEN_CN
+"International Bridge": INTERNATIONAL_BRIDGE
+"SFC Logistics": SFC_LOGISTICS
+"SFC Service": SFCSERVICE
+"BQC Express": BQC_EXPRESS
+"One World": ONE_WORLD
+"One World Express": ONEWORLDEXPRESS
+"Registered Mail Italy": IT_REGISTER_MAIL
+"WinIt": WINIT
+"Continental": CONTINENTAL
+"Enterprise Freight Systems (EFS)": EFS
+"Pantos": PANTOS
+"Relais Colis": RELAIS_COLIS
+"Relais Colis": RELAIS_COLIS_FR
+"B2C Europe": B_TWO_C_EUROPE
+"B2C Europe": B_2_CEUROPE
+"i-parcel": GLOBAL_IPARCEL
+"Global Post": GOGLOBALPOST
+"Ontrac US": US_ONTRAC
+"OnTrac": ONTRAC
+"OCS Worldwide": OCS_WORLDWIDE
+"OCS ANA Group": OCS
+"Spreadel": SPREADEL
+"ViaEurope": VIAEUROPE
+"Shippit": SHIPPIT
+"EasyMail": EASY_MAIL
+"Parcel To Post": PARCEL_2_POST
+"Direct Parcels": DIRECTPARCELS
+"Interparcel UK": INTERPARCEL_UK
+"Interparcel Australia": INTERPARCEL_AU
+"Interparcel New Zealand": INTERPARCEL_NZ
+"YunExpress": YUNEXPRESS
+"AliExpress Standard Shipping": CAINIAO
+"PayPal Package": CN_PAYPAL_PACKAGE
+"Pitney Bowes": PITNEY_BOWES
+"Amazon Shipping": AMAZON
+"Amazon Shipping + Amazon MCF": AMAZON_SHIP_MCF
+"Swiship UK": AMAZON_FBA_SWISHIP
+"Swiship DE": SWISHIP_DE
+"FedEx Cross Border": FEDEX_CROSSBORDER
+"Janio Asia": JANIO
+"ZTO Express": ZTO_EXPRESS
+"YTO Express": YTO
+"Joom Logistics": JOOM_LOGIS
+"AComm": ACOMMMERCE
+
+# US Regional Carriers
+"LaserShip": US_LASERSHIP
+"Old Dominion Freight Line": US_OLD_DOMINION
+"RL Carriers": US_RL
+"RL US": US_RL
+"YRC courier": US_YRC
+"Southeastern Freight Lines": SEFL
+"AAA Cooper": AAA_COOPER
+"Averitt Express": AVERITT
+"C.H. Robinson Worldwide": CHROBINSON
+"Con-way Freight": CON_WAY
+"Dayton Freight": DAYTON_FREIGHT
+"Estes": ESTES
+"Estes Global": GLOBAL_ESTES
+"Freightquote by C.H. Robinson": FREIGHTQUOTE
+"UPS Freight": UPS_FREIGHT
+"USF Reddaway": USF_REDDAWAY
+"XPO logistics": XPO_LOGISTICS
+"PITT OHIO": PITTOHIO
+"Pilot Freight Services": PILOT_FREIGHT
+"Roadbull Logistics": ROADRUNNER_FREIGHT
+"Lone Star Overnight": LONESTAR
+"Saia LTL Freight": SAIA_FREIGHT
+"TForce Final Mile": TFORCE_FINALMILE
+"PCF Final Mile": PCFCORP
+"Home Delivery Solutions Ltd": HOME_DELIVERY_SOLUTIONS
+"DoorDash": DOORDASH_WEBHOOK
+"Grab courier": GRAB_WEBHOOK
+"uShip courier": USHIP
+"Lalamove": LALAMOVE
+"Go!Express and logistics": GENERAL_OVERNIGHT
+"National Sameday": NATIONAL_SAMEDAY
+
+# Other/Fallback
+"OTHER": OTHER
+"Other": OTHER
+"Unknown": OTHER

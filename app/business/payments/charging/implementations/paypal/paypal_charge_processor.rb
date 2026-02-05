@@ -577,6 +577,17 @@ class PaypalChargeProcessor
     raise ChargeProcessorUnavailableError, e
   end
 
+  def fight_chargeback(charge_id, dispute_evidence)
+    dispute = find_dispute_by_charge_id(charge_id)
+    return unless dispute&.charge_processor_dispute_id
+
+    paypal_rest_api = PaypalRestApi.new
+    paypal_rest_api.provide_evidence(
+      dispute_id: dispute.charge_processor_dispute_id,
+      dispute_evidence: dispute_evidence
+    )
+  end
+
   def holder_of_funds(_merchant_account)
     HolderOfFunds::GUMROAD
   end
@@ -584,6 +595,13 @@ class PaypalChargeProcessor
   def transaction_url(charge_id)
     sub_domain = Rails.env.production? ? "history" : "sandbox"
     "https://#{sub_domain}.paypal.com/us/cgi-bin/webscr?cmd=_history-details-from-hub&id=#{charge_id}"
+  end
+
+  def find_dispute_by_charge_id(charge_id)
+    # stripe_transaction_id stores the processor's transaction ID for ALL processors
+    # For PayPal, this(i.e., paypal_transaction_id) is the capture ID (e.g., "5B223658W54364539")
+    purchase = Purchase.find_by(stripe_transaction_id: charge_id, charge_processor_id: PaypalChargeProcessor.charge_processor_id)
+    purchase&.dispute
   end
 
   private_class_method

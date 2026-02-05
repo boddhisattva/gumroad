@@ -1532,4 +1532,23 @@ describe PaypalChargeProcessor, :vcr do
       expect(PaypalChargeProcessor.formatted_amount_for_paypal(1644, "jpy").class).to eq(Integer)
     end
   end
+
+  describe "#fight_chargeback" do
+    let(:purchase) { create(:purchase, charge_processor_id: PaypalChargeProcessor.charge_processor_id, paypal_order_id: "ORDER-123") }
+    let(:dispute) { create(:dispute, purchase: purchase, charge_processor_dispute_id: "PP-D-1234") }
+    let(:dispute_evidence) { create(:dispute_evidence, dispute: dispute) }
+    let(:paypal_charge_processor) { PaypalChargeProcessor.new }
+
+    it "calls PaypalRestApi#provide_evidence with dispute ID and evidence" do
+      paypal_rest_api = instance_double(PaypalRestApi)
+      allow(PaypalRestApi).to receive(:new).and_return(paypal_rest_api)
+
+      expect(paypal_rest_api).to receive(:provide_evidence).with(
+        dispute_id: "PP-D-1234",
+        dispute_evidence: dispute_evidence
+      )
+
+      paypal_charge_processor.fight_chargeback(purchase.stripe_transaction_id, dispute_evidence)
+    end
+  end
 end
