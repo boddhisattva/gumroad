@@ -7,6 +7,20 @@ class PaypalRestApi
   PAYPAL_CARRIER_OTHER = "OTHER"
   PAYPAL_CARRIER_UNKNOWN = "Unknown"
   NOTE_MAX_LENGTH = 2000
+  PAYPAL_MAX_DOCUMENT_SIZE_BYTES = 10.megabytes
+  PAYPAL_MAX_TOTAL_UPLOAD_SIZE_BYTES = 50.megabytes
+  PAYPAL_ALLOWED_CONTENT_TYPES = %w[image/jpeg image/gif image/png application/pdf].freeze
+
+  GUMROAD_PAYPAL_EVIDENCE_TYPE_MAPPING = {
+    receipt_image: "PROOF_OF_RECEIPT_COPY",
+    refund_policy_image: "RETURN_POLICY",
+    cancellation_policy_image: "RETURN_POLICY", # a cancellation policy is a type of return/terms policy
+    customer_communication_file: "PROOF_OF_FULFILLMENT"
+  }.freeze
+
+  EVIDENCE_TYPE_PROOF_OF_FULFILLMENT = "PROOF_OF_FULFILLMENT"
+  EVIDENCE_TYPE_PROOF_OF_REFUND = "PROOF_OF_REFUND"
+  EVIDENCE_TYPE_OTHER = "OTHER"
 
   def initialize
     paypal_environment = Rails.env.production? ?
@@ -130,17 +144,13 @@ class PaypalRestApi
     base_url = @paypal_client.environment.base_url
     url = "#{base_url}/v1/customer/disputes/#{dispute_id}/provide-evidence"
 
-    attached_files = all_attached_files(dispute_evidence)
+    evidences = categorically_build_typed_evidence_items(dispute_evidence)
 
-    evidence = {
-      documents: attached_files.map { |blob| { name: blob.filename.to_s } },
-      notes: build_evidence_notes(dispute_evidence)
-    }
+    return OpenStruct.new(status_code: 200, result: { "message" => "No evidence to submit" }) if evidences.empty?
 
-    evidence_info = build_evidence_info(dispute_evidence)
-    evidence[:evidence_info] = evidence_info if evidence_info.present?
+    attached_files = collect_attached_files_for_upload(dispute_evidence)
 
-    input_json = { evidences: [evidence] }
+    input_json = { evidences: evidences }
 
     payload = { input: input_json.to_json }
     attached_files.each_with_index { |blob, index| payload["file#{index + 1}"] = blob.download }
@@ -158,6 +168,151 @@ class PaypalRestApi
   end
 
   private
+    def categorically_build_typed_evidence_items(dispute_evidence)
+      evidences = []
+
+      fulfillment_evidence = build_fulfillment_based_evidence(dispute_evidence)
+      evidences << fulfillment_evidence if fulfillment_evidence.present?
+
+      document_evidences = build_document_based_evidence_items(dispute_evidence)
+      evidences.concat(document_evidences)
+
+      refund_evidence = build_refund_based_evidence(dispute_evidence)
+      evidences << refund_evidence if refund_evidence.present?
+
+      notes_evidence = build_other_type_based_notes_evidence(dispute_evidence)
+      evidences << notes_evidence if notes_evidence.present?
+
+      evidences
+    end
+
+    def build_fulfillment_based_evidence(dispute_evidence)
+      evidence = { evidence_type: EVIDENCE_TYPE_PROOF_OF_FULFILLMENT }
+
+      if dispute_evidence.shipping_tracking_number.present?
+        tracking_info = build_tracking_info(dispute_evidence)
+        evidence[:evidence_info] = { tracking_info: [tracking_info] } if tracking_info.present?
+      end
+
+      if dispute_evidence.customer_communication_file.attached?
+        evidence[:documents] = [{ name: dispute_evidence.customer_communication_file.filename.to_s }]
+      end
+
+      has_tracking_info = evidence.key?(:evidence_info)
+      has_documents = evidence.key?(:documents)
+
+      evidence if has_tracking_info || has_documents
+    end
+
+    def build_document_based_evidence_items(dispute_evidence)
+      items = []
+
+      if dispute_evidence.receipt_image.attached?
+        items << {
+          evidence_type: GUMROAD_PAYPAL_EVIDENCE_TYPE_MAPPING[:receipt_image],
+          documents: [{ name: dispute_evidence.receipt_image.filename.to_s }]
+        }
+      end
+
+      if dispute_evidence.for_subscription_purchase?
+        if dispute_evidence.cancellation_policy_image.attached?
+          items << {
+            evidence_type: GUMROAD_PAYPAL_EVIDENCE_TYPE_MAPPING[:cancellation_policy_image],
+            documents: [{ name: dispute_evidence.cancellation_policy_image.filename.to_s }]
+          }
+        end
+      else
+        if dispute_evidence.refund_policy_image.attached?
+          items << {
+            evidence_type: GUMROAD_PAYPAL_EVIDENCE_TYPE_MAPPING[:refund_policy_image],
+            documents: [{ name: dispute_evidence.refund_policy_image.filename.to_s }]
+          }
+        end
+      end
+
+      items
+    end
+
+    def build_refund_based_evidence(dispute_evidence)
+      refund_ids = find_paypal_refund_ids_for_disputed_purchases(dispute_evidence)
+      return nil if refund_ids.empty?
+
+      {
+        evidence_type: EVIDENCE_TYPE_PROOF_OF_REFUND,
+        evidence_info: { refund_ids: refund_ids }
+      }
+    end
+
+    def find_paypal_refund_ids_for_disputed_purchases(dispute_evidence)
+      disputed_purchases = dispute_evidence.dispute.disputable.disputed_purchases
+
+      disputed_purchases.flat_map do |purchase|
+        purchase.refunds.filter_map(&:processor_refund_id)
+      end.compact.uniq
+    end
+
+    def build_other_type_based_notes_evidence(dispute_evidence)
+      notes = build_evidence_notes(dispute_evidence)
+      return nil if notes.blank?
+
+      {
+        evidence_type: EVIDENCE_TYPE_OTHER,
+        notes: notes
+      }
+    end
+
+    def collect_attached_files_for_upload(dispute_evidence)
+      candidates = attached_file_candidates(dispute_evidence)
+
+      valid_attachments = []
+      total_size = 0
+
+      candidates.each do |attachment|
+        unless PAYPAL_ALLOWED_CONTENT_TYPES.include?(attachment.content_type)
+          log_skipped_file(dispute_evidence, attachment, "unsupported content type: #{attachment.content_type}")
+          next
+        end
+
+        if attachment.byte_size > PAYPAL_MAX_DOCUMENT_SIZE_BYTES
+          log_skipped_file(dispute_evidence, attachment, "exceeds individual size limit: #{attachment.byte_size} bytes")
+          next
+        end
+
+        if total_size + attachment.byte_size > PAYPAL_MAX_TOTAL_UPLOAD_SIZE_BYTES
+          log_skipped_file(dispute_evidence, attachment, "would exceed total upload limit of #{PAYPAL_MAX_TOTAL_UPLOAD_SIZE_BYTES} bytes")
+          next
+        end
+
+        valid_attachments << attachment
+        total_size += attachment.byte_size
+      end
+
+      valid_attachments
+    end
+
+    def attached_file_candidates(dispute_evidence)
+      candidates = []
+
+      candidates << dispute_evidence.receipt_image if dispute_evidence.receipt_image.attached?
+
+      if dispute_evidence.for_subscription_purchase?
+        candidates << dispute_evidence.cancellation_policy_image if dispute_evidence.cancellation_policy_image.attached?
+      else
+        candidates << dispute_evidence.refund_policy_image if dispute_evidence.refund_policy_image.attached?
+      end
+
+      candidates << dispute_evidence.customer_communication_file if dispute_evidence.customer_communication_file.attached?
+
+      candidates
+    end
+
+    def log_skipped_file(dispute_evidence, attachment, reason)
+      Bugsnag.notify(
+        "PayPal provide-evidence: Skipped file '#{attachment.filename}' " \
+        "for dispute evidence #{dispute_evidence.id} — #{reason}"
+      )
+    end
+
     def purchase_unit(purchase_unit_info)
       currency = purchase_unit_info[:currency]
 
@@ -205,15 +360,6 @@ class PaypalRestApi
       body
     end
 
-    # Dynamically collects all attached files from DisputeEvidence
-    # Uses Rails reflection to find all ActiveStorage attachments
-    def all_attached_files(dispute_evidence)
-      dispute_evidence.class.reflect_on_all_attachments.filter_map do |attachment|
-        blob = dispute_evidence.public_send(attachment.name)
-        blob if blob.attached?
-      end
-    end
-
     def build_evidence_info(dispute_evidence)
       info = {}
 
@@ -244,6 +390,10 @@ class PaypalRestApi
       end
 
       tracking_info[:tracking_number] = dispute_evidence.shipping_tracking_number
+
+      purchase = dispute_evidence.disputable.purchase_for_dispute_evidence
+      calculated_tracking_url = purchase&.shipment&.calculated_tracking_url
+      tracking_info[:tracking_url] = calculated_tracking_url if calculated_tracking_url.present?
 
       tracking_info
     end
