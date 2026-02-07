@@ -15,6 +15,7 @@ class DisputeEvidence::GenerateAccessActivityLogsService
   def perform
     [
       email_activity,
+      license_activity,
       rental_activity,
       usage_activity,
     ].compact.join("\n\n").presence
@@ -27,6 +28,16 @@ class DisputeEvidence::GenerateAccessActivityLogsService
       return unless url_redirect.present? && url_redirect.rental_first_viewed_at.present?
 
       "The rented content was first viewed at #{url_redirect.rental_first_viewed_at}."
+    end
+
+    def license_activity
+      license = purchase.license
+      return unless license.present?
+
+      content = "License key #{license.serial} was issued on #{license.created_at.to_fs(:formatted_date_full_month)}."
+      content << " License activated #{license.uses} #{"time".pluralize(license.uses)}."
+      content << " License is currently disabled." if license.disabled?
+      content
     end
 
     def usage_activity

@@ -427,6 +427,7 @@ class PaypalRestApi
       notes << "IP: #{dispute_evidence.customer_purchase_ip}" if dispute_evidence.customer_purchase_ip.present?
       notes << "Billing address: #{dispute_evidence.billing_address}" if dispute_evidence.billing_address.present?
       notes << "Shipping address: #{dispute_evidence.shipping_address}" if dispute_evidence.shipping_address.present?
+      notes << "Access activity: #{dispute_evidence.access_activity_log}" if dispute_evidence.access_activity_log.present?
       notes << "Reason for winning: #{dispute_evidence.reason_for_winning}" if dispute_evidence.reason_for_winning.present?
       notes << dispute_evidence.uncategorized_text if dispute_evidence.uncategorized_text.present?
 
