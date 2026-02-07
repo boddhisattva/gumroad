@@ -158,9 +158,30 @@ class PaypalRestApi
     response = RestClient.post(url, payload, rest_api_headers)
     OpenStruct.new(status_code: response.code, result: JSON.parse(response.body))
   rescue RestClient::ExceptionWithResponse => e
-    # TODO: Consider improving error handling later with notifying via Bugsnag
-    Rails.logger.error "PayPal provide-evidence failed: #{e.response.body}"
-    raise ChargeProcessorInvalidRequestError.new(e.response.body)
+    Bugsnag.notify(e) do |report|
+      report.add_metadata(:paypal_dispute_evidence, {
+        dispute_id: dispute_id,
+        error_type: e.class.name,
+        error_message: e.message,
+        status_code: e.response.code,
+        response_body: e.response.body
+      })
+    end
+    if e.response.code.to_i >= 500
+      raise ChargeProcessorUnavailableError.new("PayPal service error for dispute #{dispute_id}: #{e.response.body}")
+    else
+      raise ChargeProcessorInvalidRequestError.new(e.response.body)
+    end
+  rescue RestClient::ServerBrokeConnection, RestClient::Exceptions::OpenTimeout,
+         RestClient::Exceptions::ReadTimeout, Errno::ECONNREFUSED => e
+    Bugsnag.notify(e) do |report|
+      report.add_metadata(:paypal_dispute_evidence, {
+        dispute_id: dispute_id,
+        error_type: e.class.name,
+        error_message: e.message
+      })
+    end
+    raise ChargeProcessorUnavailableError.new("Network error submitting evidence for dispute #{dispute_id}: #{e.message}")
   end
 
   def successful_response?(api_response)
