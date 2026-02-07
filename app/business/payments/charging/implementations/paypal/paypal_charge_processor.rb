@@ -16,6 +16,12 @@ class PaypalChargeProcessor
   DISPUTE_OUTCOME_SELLER_FAVOUR = %w[RESOLVED_SELLER_FAVOUR CANCELED_BY_BUYER DENIED].freeze
   private_constant :DISPUTE_OUTCOME_SELLER_FAVOUR
 
+  DISPUTE_STATUS_WAITING_FOR_SELLER_RESPONSE = "WAITING_FOR_SELLER_RESPONSE"
+  private_constant :DISPUTE_STATUS_WAITING_FOR_SELLER_RESPONSE
+
+  EVIDENCE_RESUBMISSION_COOLDOWN = 1.hour
+  private_constant :EVIDENCE_RESUBMISSION_COOLDOWN
+
   # https://developer.paypal.com/docs/api/orders/v1/
   VALID_TRANSACTION_STATUSES = %w(created approved completed)
 
@@ -72,6 +78,8 @@ class PaypalChargeProcessor
       handle_dispute_created_event(event_info)
     when PaypalEventType::CUSTOMER_DISPUTE_RESOLVED
       handle_dispute_resolved_event(event_info)
+    when PaypalEventType::CUSTOMER_DISPUTE_UPDATED
+      handle_dispute_updated_event(event_info)
     when PaypalEventType::PAYMENT_CAPTURE_COMPLETED
       handle_payment_capture_completed_event(event_info)
     when PaypalEventType::PAYMENT_CAPTURE_DENIED
@@ -97,6 +105,34 @@ class PaypalChargeProcessor
     raise ChargeProcessorError, build_error_message(e.message, event_info)
   end
   private_class_method :handle_dispute_resolved_event
+
+  def self.handle_dispute_updated_event(event_info)
+    dispute_status = event_info.dig("resource", "status")
+
+    if dispute_status == DISPUTE_STATUS_WAITING_FOR_SELLER_RESPONSE
+      seller_transaction_id = event_info["resource"]["disputed_transactions"][0]["seller_transaction_id"]
+      purchase = Purchase.find_by(stripe_transaction_id: seller_transaction_id)
+      return unless purchase&.dispute
+
+      dispute_evidence = purchase.dispute.dispute_evidence
+      return if dispute_evidence.blank?
+      return if dispute_evidence.resolved? && evidence_recently_submitted?(dispute_evidence)
+
+      dispute_evidence.update!(resolved_at: nil, resolution: nil)
+      FightDisputeJob.perform_async(purchase.dispute.id)
+    else
+      handle_dispute_event(event_info, ChargeEvent::TYPE_INFORMATIONAL)
+    end
+  rescue StandardError => e
+    raise ChargeProcessorError, build_error_message(e.message, event_info)
+  end
+  private_class_method :handle_dispute_updated_event
+
+  def self.evidence_recently_submitted?(dispute_evidence)
+    dispute_evidence.resolved_at.present? &&
+      dispute_evidence.resolved_at > EVIDENCE_RESUBMISSION_COOLDOWN.ago
+  end
+  private_class_method :evidence_recently_submitted?
 
   def self.handle_payment_capture_completed_event(event_info)
     paypal_fee = event_info.dig("resource", "seller_receivable_breakdown", "paypal_fee")
