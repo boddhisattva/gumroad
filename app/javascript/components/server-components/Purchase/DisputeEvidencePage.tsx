@@ -26,8 +26,6 @@ import { Card, CardContent } from "$app/components/ui/Card";
 import { Row, RowActions, RowContent, Rows } from "$app/components/ui/Rows";
 import { useUserAgentInfo } from "$app/components/UserAgent";
 
-const ALLOWED_EXTENSIONS = ["jpeg", "jpg", "png", "pdf"];
-
 type Props = {
   dispute_evidence: {
     dispute_reason: DisputeReason;
@@ -35,6 +33,7 @@ type Props = {
     purchased_at: string;
     duration_left_to_submit_evidence_formatted: string;
     customer_communication_file_max_size: number;
+    allowed_file_extensions: string[];
     blobs: Blobs;
   };
   disputable: {
@@ -119,7 +118,7 @@ const DisputeEvidencePage = ({ dispute_evidence, disputable, products }: Props) 
     const file = fileInputRef.current?.files?.[0];
     if (!file) return;
 
-    if (!FileUtils.isFileNameExtensionAllowed(file.name, ALLOWED_EXTENSIONS))
+    if (!FileUtils.isFileNameExtensionAllowed(file.name, dispute_evidence.allowed_file_extensions))
       return showAlert("Invalid file type.", "error");
     if (file.size > dispute_evidence.customer_communication_file_max_size)
       return showAlert("The file exceeds the maximum size allowed.", "error");
@@ -301,7 +300,7 @@ const DisputeEvidencePage = ({ dispute_evidence, disputable, products }: Props) 
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept={ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+                    accept={dispute_evidence.allowed_file_extensions.map((ext) => `.${ext}`).join(",")}
                     tabIndex={-1}
                     onChange={handleFileUpload}
                   />
@@ -319,7 +318,8 @@ const DisputeEvidencePage = ({ dispute_evidence, disputable, products }: Props) 
                   <p>
                     Any communication with the customer that you feel is relevant to your case (emails, chats, etc.
                     proving that they received the product or service, or screenshots demonstrating their use of or
-                    satisfaction with the product or service). Please upload one JPG, PNG, or PDF file under{" "}
+                    satisfaction with the product or service). Please upload one{" "}
+                    {dispute_evidence.allowed_file_extensions.map((ext) => ext.toUpperCase()).join(", ")} file under{" "}
                     {FileUtils.getReadableFileSize(dispute_evidence.customer_communication_file_max_size)}. If you have
                     multiple files, consolidate them into a single PDF.
                   </p>

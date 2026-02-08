@@ -64,9 +64,11 @@ class Purchases::DisputeEvidenceController < ApplicationController
     # > 16-bit depth or interlacing. Please convert your image to PDF or JPEG and try again.
     # Rather than blocking the user from submitting PNGs, convert to JPG and optimize the file.
     #
+
     def covert_and_optimize_blob_if_needed(signed_blob_id)
       blob = ActiveStorage::Blob.find_signed(signed_blob_id)
       return blob unless blob.content_type == "image/png"
+      return blob if !@dispute_evidence.requires_png_conversion?
 
       variant = blob.variant(convert: "jpg", quality: 80)
       new_blob = ActiveStorage::Blob.create_and_upload!(

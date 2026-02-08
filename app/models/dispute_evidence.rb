@@ -32,9 +32,23 @@ class DisputeEvidence < ApplicationRecord
   belongs_to :dispute
 
   SUBMIT_EVIDENCE_WINDOW_DURATION_IN_HOURS = 72
-  STRIPE_MAX_COMBINED_FILE_SIZE = 5_000_000.bytes
   MINIMUM_RECOMMENDED_CUSTOMER_COMMUNICATION_FILE_SIZE = 1_000_000.bytes
-  ALLOWED_FILE_CONTENT_TYPES = %w[image/jpeg image/png application/pdf].freeze
+
+  EVIDENCE_LIMITS = {
+    "stripe" => {
+      max_combined_file_size: 5_000_000,
+      allowed_content_types: %w[image/jpeg image/png application/pdf],
+      allowed_extensions: %w[jpeg jpg png pdf],
+      requires_png_conversion: true
+    },
+    "paypal" => {
+      max_combined_file_size: 50_000_000,
+      max_individual_file_size: 10_000_000,
+      allowed_content_types: %w[image/jpeg image/gif image/png application/pdf],
+      allowed_extensions: %w[jpeg jpg gif png pdf],
+      requires_png_conversion: false
+    }
+  }.freeze
 
   RESOLUTIONS = %w(unknown submitted rejected).freeze
   RESOLUTIONS.each do |resolution|
@@ -74,9 +88,30 @@ class DisputeEvidence < ApplicationRecord
 
   def customer_communication_file_type
     return unless customer_communication_file.attached?
-    return if customer_communication_file.content_type.in?(ALLOWED_FILE_CONTENT_TYPES)
+    return if customer_communication_file.content_type.in?(allowed_file_content_types)
 
     errors.add(:base, "Invalid file type.")
+  end
+
+  def processor_evidence_limits
+    charge_processor_id = dispute&.purchase&.charge_processor_id
+    EVIDENCE_LIMITS[charge_processor_id] || EVIDENCE_LIMITS["stripe"]
+  end
+
+  def max_combined_file_size
+    processor_evidence_limits[:max_combined_file_size]
+  end
+
+  def allowed_file_content_types
+    processor_evidence_limits[:allowed_content_types]
+  end
+
+  def allowed_file_extensions
+    processor_evidence_limits[:allowed_extensions]
+  end
+
+  def requires_png_conversion?
+    processor_evidence_limits[:requires_png_conversion]
   end
 
   def hours_left_to_submit_evidence
@@ -90,19 +125,19 @@ class DisputeEvidence < ApplicationRecord
       policy_image.byte_size.to_i +
       customer_communication_file.byte_size.to_i
 
-    return if STRIPE_MAX_COMBINED_FILE_SIZE >= all_files_size
+    return if max_combined_file_size >= all_files_size
 
-    errors.add(:base, "Uploaded files exceed the maximum size allowed by Stripe.")
+    errors.add(:base, "Uploaded files exceed the maximum size allowed.")
   end
 
   def customer_communication_file_max_size
-    @_customer_communication_file_max_size = STRIPE_MAX_COMBINED_FILE_SIZE -
+    @_customer_communication_file_max_size = max_combined_file_size -
       receipt_image.byte_size.to_i -
       policy_image.byte_size.to_i
   end
 
   def policy_image_max_size
-    @_policy_image_max_size = STRIPE_MAX_COMBINED_FILE_SIZE -
+    @_policy_image_max_size = max_combined_file_size -
       MINIMUM_RECOMMENDED_CUSTOMER_COMMUNICATION_FILE_SIZE -
       receipt_image.byte_size.to_i
   end

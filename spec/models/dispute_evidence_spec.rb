@@ -197,9 +197,9 @@ describe DisputeEvidence do
     end
 
     it "returns correct value" do
-      expect(dispute_evidence.policy_image_max_size < DisputeEvidence::STRIPE_MAX_COMBINED_FILE_SIZE).to be(true)
+      expect(dispute_evidence.policy_image_max_size < dispute_evidence.max_combined_file_size).to be(true)
       expect(dispute_evidence.policy_image_max_size).to eq(
-        DisputeEvidence::STRIPE_MAX_COMBINED_FILE_SIZE -
+        dispute_evidence.max_combined_file_size -
         dispute_evidence.receipt_image.byte_size.to_i -
         DisputeEvidence::MINIMUM_RECOMMENDED_CUSTOMER_COMMUNICATION_FILE_SIZE
       )
@@ -241,6 +241,70 @@ describe DisputeEvidence do
       charge.purchases << create(:membership_purchase)
 
       expect(dispute_evidence.for_subscription_purchase?).to be true
+    end
+  end
+
+  describe "processor-aware evidence limits" do
+    let(:stripe_purchase) { create(:purchase, charge_processor_id: "stripe") }
+    let(:paypal_purchase) { create(:purchase, charge_processor_id: "paypal") }
+    let(:stripe_dispute) { create(:dispute, purchase: stripe_purchase) }
+    let(:paypal_dispute) { create(:dispute, purchase: paypal_purchase) }
+
+    describe "#max_combined_file_size" do
+      it "returns Stripe limit for Stripe disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: stripe_dispute)
+        expect(dispute_evidence.max_combined_file_size).to eq(5_000_000)
+      end
+
+      it "returns PayPal limit for PayPal disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: paypal_dispute)
+        expect(dispute_evidence.max_combined_file_size).to eq(50_000_000)
+      end
+
+      it "defaults to Stripe limit for unknown processors" do
+        unknown_purchase = create(:purchase, charge_processor_id: "unknown_processor")
+        unknown_dispute = create(:dispute, purchase: unknown_purchase)
+        dispute_evidence = create(:dispute_evidence, dispute: unknown_dispute)
+        expect(dispute_evidence.max_combined_file_size).to eq(5_000_000)
+      end
+    end
+
+    describe "#allowed_file_content_types" do
+      it "returns Stripe types for Stripe disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: stripe_dispute)
+        expect(dispute_evidence.allowed_file_content_types).to eq(%w[image/jpeg image/png application/pdf])
+      end
+
+      it "includes GIF for PayPal disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: paypal_dispute)
+        expect(dispute_evidence.allowed_file_content_types).to include("image/gif")
+        expect(dispute_evidence.allowed_file_content_types).to eq(%w[image/jpeg image/gif image/png application/pdf])
+      end
+    end
+
+    describe "#allowed_file_extensions" do
+      it "returns Stripe extensions for Stripe disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: stripe_dispute)
+        expect(dispute_evidence.allowed_file_extensions).to eq(%w[jpeg jpg png pdf])
+      end
+
+      it "includes gif for PayPal disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: paypal_dispute)
+        expect(dispute_evidence.allowed_file_extensions).to include("gif")
+        expect(dispute_evidence.allowed_file_extensions).to eq(%w[jpeg jpg gif png pdf])
+      end
+    end
+
+    describe "#requires_png_conversion?" do
+      it "returns true for Stripe disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: stripe_dispute)
+        expect(dispute_evidence.requires_png_conversion?).to be(true)
+      end
+
+      it "returns false for PayPal disputes" do
+        dispute_evidence = create(:dispute_evidence, dispute: paypal_dispute)
+        expect(dispute_evidence.requires_png_conversion?).to be(false)
+      end
     end
   end
 end

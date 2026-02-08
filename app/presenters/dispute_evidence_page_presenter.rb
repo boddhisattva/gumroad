@@ -25,6 +25,7 @@ class DisputeEvidencePagePresenter
         purchased_at: dispute_evidence.purchased_at,
         duration_left_to_submit_evidence_formatted:,
         customer_communication_file_max_size: dispute_evidence.customer_communication_file_max_size,
+        allowed_file_extensions: dispute_evidence.allowed_file_extensions,
         blobs: blobs_props
       }
     end
