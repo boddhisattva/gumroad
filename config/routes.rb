@@ -67,7 +67,11 @@ Rails.application.routes.draw do
           post :resend_receipt
         end
       end
-      resources :payouts, only: [:index, :show]
+      resources :payouts, only: [:index, :show] do
+        collection do
+          get :upcoming
+        end
+      end
       resources :subscribers, only: [:show]
 
       put "/resource_subscriptions", to: "resource_subscriptions#create"
