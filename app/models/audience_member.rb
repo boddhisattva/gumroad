@@ -28,6 +28,8 @@ class AudienceMember < ApplicationRecord
 
     base_relation = where(seller_id:)
     base_relation = base_relation.where(params[:type] => true) if params[:type]
+    base_relation = base_relation.where(arel_table[:max_paid_cents].gt(params[:paid_more_than_cents])) if params[:paid_more_than_cents]
+    base_relation = base_relation.where(arel_table[:min_paid_cents].lt(params[:paid_less_than_cents])) if params[:paid_less_than_cents]
 
     if params[:bought_product_ids]
       products_relation = where(seller_id:)
@@ -61,13 +63,6 @@ class AudienceMember < ApplicationRecord
       variants_where_sql = (["(#{json_contains} IS NULL OR #{json_contains} = 0)"] * params[:not_bought_variant_ids].size).join(" AND ")
       variants_relation = variants_relation.where(variants_where_sql, *(params[:not_bought_variant_ids].zip(params[:not_bought_variant_ids]).flatten))
       not_bought_variants_sql = variants_relation.to_sql
-    end
-
-    if params[:paid_more_than_cents] || params[:paid_less_than_cents]
-      prices_relation = where(seller_id:)
-      prices_relation = prices_relation.where("max_paid_cents > ?", params[:paid_more_than_cents]) if params[:paid_more_than_cents]
-      prices_relation = prices_relation.where("min_paid_cents < ?", params[:paid_less_than_cents]) if params[:paid_less_than_cents]
-      prices_sql = prices_relation.to_sql
     end
 
     if params[:created_after] || params[:created_before]
@@ -177,7 +172,6 @@ class AudienceMember < ApplicationRecord
       bought_products_union_variants_sql,
       not_bought_products_sql,
       not_bought_variants_sql,
-      prices_sql,
       created_at_sql,
       country_sql,
       affiliates_sql,
