@@ -24,8 +24,10 @@ class AudienceMember < ApplicationRecord
 
     if params[:type]
       raise ArgumentError, "Invalid type: #{params[:type]}. Must be one of: #{VALID_FILTER_TYPES.join(', ')}" unless params[:type].in?(VALID_FILTER_TYPES)
-      types_sql = where(:seller_id => seller_id, params[:type] => true).to_sql
     end
+
+    base_relation = where(seller_id:)
+    base_relation = base_relation.where(params[:type] => true) if params[:type]
 
     if params[:bought_product_ids]
       products_relation = where(seller_id:)
@@ -172,7 +174,6 @@ class AudienceMember < ApplicationRecord
     end
 
     subqueries = [
-      types_sql,
       bought_products_union_variants_sql,
       not_bought_products_sql,
       not_bought_variants_sql,
@@ -182,16 +183,15 @@ class AudienceMember < ApplicationRecord
       affiliates_sql,
       json_filter_sql,
     ].compact
-    return where(seller_id:) if subqueries.empty?
+    return base_relation if subqueries.empty?
 
-
-    relation = from("(#{subqueries.first}) AS audience_members")
-    subqueries[1..].each.with_index do |subquery_sql, index|
+    relation = from("(#{base_relation.to_sql}) AS audience_members")
+    subqueries.each.with_index do |subquery_sql, index|
       relation = relation.joins("INNER JOIN (#{subquery_sql}) AS q#{index} ON audience_members.id = q#{index}.id")
     end
 
     if json_filter_sql
-      json_subquery_index = subqueries[1..].index(json_filter_sql)
+      json_subquery_index = subqueries.index(json_filter_sql)
       # If the json filter is a subquery, we need to extract the id columns from it and add them to the root query.
       if with_ids && json_subquery_index
         relation = relation.select("audience_members.*, q#{json_subquery_index}.purchase_id AS purchase_id, q#{json_subquery_index}.follower_id AS follower_id, q#{json_subquery_index}.affiliate_id AS affiliate_id")
