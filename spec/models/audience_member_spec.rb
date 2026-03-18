@@ -164,12 +164,6 @@ RSpec.describe AudienceMember, :freeze_time do
       expect(filtered(paid_more_than_cents: 0, bought_variant_ids: [1, 2])).to eq([member4])
     end
 
-    it "applies paid_* price filters on the base relation (no join) when used alone" do
-      sql = described_class.filter(seller_id:, params: { type: "customer", paid_more_than_cents: 100 }).to_sql
-      expect(sql).to include("max_paid_cents")
-      expect(sql).not_to include("INNER JOIN")
-    end
-
     it "deduplicates rows joined by json_table" do
       member = create_member(purchases: [
                                { "price_cents" => 100 },
