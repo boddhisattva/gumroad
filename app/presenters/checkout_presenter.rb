@@ -50,6 +50,7 @@ class CheckoutPresenter
   def checkout_product(product, cart_item, params, include_cross_sells: true)
     return unless product.present?
     upsell_variants = product.available_upsell_variants.alive.includes(:selected_variant, :offered_variant)
+    upsell_variants_by_option_id = upsell_variants.index_by { |uv| uv.selected_variant.external_id }
     bundle_products = product.bundle_products.in_order.includes(:product, :variant).alive.load
     accepted_offer = params[:accepted_offer_id] ? Upsell.available_to_customers.where(product:).find_by_external_id(params[:accepted_offer_id]) : nil
     option_id = accepted_offer&.variant&.external_id || cart_item[:option]&.fetch(:id)
@@ -81,7 +82,7 @@ class CheckoutPresenter
         recurrences: product.recurrences,
         can_gift: product.can_gift?,
         options: product.options.map do |option|
-          upsell_variant = upsell_variants.find { |upsell_variant| upsell_variant.selected_variant.external_id == option[:id] }
+          upsell_variant = upsell_variants_by_option_id[option[:id]]
           option.merge(
             {
               upsell_offered_variant_id: upsell_variant.present? &&
