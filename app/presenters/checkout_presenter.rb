@@ -49,6 +49,7 @@ class CheckoutPresenter
 
   def checkout_product(product, cart_item, params, include_cross_sells: true)
     return unless product.present?
+
     upsell_variants = product.available_upsell_variants.alive.includes(:selected_variant, :offered_variant)
     upsell_variants_by_option_id = upsell_variants.index_by { |uv| uv.selected_variant.external_id }
     bundle_products = product.bundle_products.in_order.includes(:product, :variant).alive.load
@@ -356,5 +357,13 @@ class CheckoutPresenter
 
     def already_purchased?(product, variant)
       purchased_product_variant_set.include?([product&.id, variant&.id])
+    end
+
+    def purchased_product_variant_pairs
+      @_purchased_pairs ||= Set.new(purchases.map { |p| [p[:product]&.id, p[:variant]&.id] })
+    end
+
+    def buyer_has_not_purchased?(product:, variant:)
+      !purchased_product_variant_pairs.include?([product.id, variant&.id])
     end
 end
