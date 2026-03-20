@@ -28,13 +28,17 @@ class CartPresenter
         ] }
       ).load
 
+    products_for_discount_codes = cart_products.each_with_object({}) do |cart_product, products|
+      product = cart_product.product
+      products[product.unique_permalink] = { permalink: product.unique_permalink, quantity: cart_product.quantity }
+    end
+
     {
       email: cart.email.presence,
       returnUrl: cart.return_url.presence || "",
       rejectPppDiscount: cart.reject_ppp_discount,
       discountCodes: cart.discount_codes.map do |discount_code|
-        products = cart_products.each_with_object({}) { |cart_product, hash| hash[cart_product.product.unique_permalink] = { permalink: cart_product.product.unique_permalink, quantity: cart_product.quantity } }
-        result = OfferCodeDiscountComputingService.new(discount_code["code"], products).process
+        result = OfferCodeDiscountComputingService.new(discount_code["code"], products_for_discount_codes).process
 
         {
           code: discount_code["code"],
